@@ -9,4 +9,4 @@ The use is very simple, the available commands are the following:
 
 `./converter help` : Displays the script help
 
-`./converter source.cvs final_file.txt`
+`./converter source.csv final_file.txt`
