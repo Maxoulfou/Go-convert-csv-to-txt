@@ -23,14 +23,53 @@ func main() {
 
 	Arguments = os.Args[1:]
 
-	if len(Arguments) == 1 {
+	//Setup log file
+	f, errLogs := os.OpenFile("log.log", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+
+	if errLogs != nil {
+		log.Fatalf("Error opening file: %v", errLogs)
+	}
+
+	defer func(f *os.File) {
+		errDeferCloseLogFile := f.Close()
+		if errDeferCloseLogFile != nil {
+			log.Printf(errDeferCloseLogFile.Error())
+		}
+	}(f)
+
+	log.SetOutput(f)
+	log.Println("Start")
+	fmt.Println("Start ...")
+
+	// ---
+
+	if len(Arguments) == 0 {
+		fmt.Println("There is no argument, please execute './converter help'\n")
+	} else if len(Arguments) == 1 {
 		if Arguments[0] == "help" {
 			Help()
 			os.Exit(1)
+		} else if Arguments[0] != "help" {
+			fmt.Printf("The only argument "+Arguments[0]+" is unknown\n")
 		}
 	} else if len(Arguments) == 2 {
-		InputFile = Arguments[0]
-		OutputFile = Arguments[1]
+		RegexInput, _ := regexp.MatchString(`^[\w,\s-]+\.(csv)$`, Arguments[0])
+		RegexOutput, _ := regexp.MatchString(`^[\w,\s-]+\.(txt)$`, Arguments[1])
+		if RegexInput {
+			InputFile = Arguments[0]
+			fmt.Printf("Your input file: "+InputFile+" is valid\n")
+		} else {
+			fmt.Printf("Your input filename must has [dot]csv extension and no special char !\n")
+		}
+		if RegexOutput {
+			OutputFile = Arguments[1]
+			fmt.Printf("Your output file: "+OutputFile+" is valid\n")
+		} else {
+			fmt.Printf("Your output filename must has [dot]txt extension and no special char !\n")
+		}
+
+	} else if len(Arguments) > 2 {
+		fmt.Printf("There is too much arguments\n")
 	}
 
 
@@ -58,7 +97,7 @@ func main() {
 
 			// DEBUG
 			// fmt.Printf("Client Code: %s\nNom: %s\nEmail: %s\nAdress: %s\n--- --- ---\n", client.code, client.nom, client.email, client.adress)
-			fmt.Printf("Email: %s\n", client.email)
+			// log.Printf("Email: %+v\n", client.email)
 
 			f, errFile := os.OpenFile(OutputFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
@@ -80,9 +119,11 @@ func main() {
 				log.Fatal(errWriteEmail)
 			}
 
-			fmt.Println("Email was successfully wroten\n")
+			log.Printf("Email %+v was successfully wroten\n", client.email)
 		}
 	}
+	log.Println("End")
+	fmt.Println("End !")
 }
 
 func readData(fileName string) ([][]string, error) {
@@ -115,5 +156,5 @@ func readData(fileName string) ([][]string, error) {
 func Help(){
 	fmt.Printf("Bienvenue dans l'aide\n")
 	fmt.Printf("Pour utiliser le script il suffit de mettre en premier paramètre\nle fichier d'entrée au format \".csv\" et en second paramètre le fichier de sortie au format \".txt\"\n")
-	fmt.Printf("Exemple: ./converter emails.csv list_email.txt")
+	fmt.Printf("Exemple: ./converter emails.csv list_email.txt\n")
 }
