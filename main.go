@@ -10,9 +10,9 @@ import (
 )
 
 type Client struct {
-	code  string
-	nom   string
-	email string
+	code   string
+	nom    string
+	email  string
 	adress string
 }
 
@@ -24,7 +24,7 @@ func main() {
 	Arguments = os.Args[1:]
 
 	//Setup log file
-	f, errLogs := os.OpenFile("log.log", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+	f, errLogs := os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
 	if errLogs != nil {
 		log.Fatalf("Error opening file: %v", errLogs)
@@ -50,20 +50,20 @@ func main() {
 			Help()
 			os.Exit(1)
 		} else if Arguments[0] != "help" {
-			fmt.Printf("The only argument "+Arguments[0]+" is unknown\n")
+			fmt.Printf("The only argument " + Arguments[0] + " is unknown\n")
 		}
 	} else if len(Arguments) == 2 {
 		RegexInput, _ := regexp.MatchString(`^[\w,\s-]+\.(csv)$`, Arguments[0])
 		RegexOutput, _ := regexp.MatchString(`^[\w,\s-]+\.(txt)$`, Arguments[1])
 		if RegexInput {
 			InputFile = Arguments[0]
-			fmt.Printf("Your input file: "+InputFile+" is valid\n")
+			fmt.Printf("Your input file: " + InputFile + " is valid\n")
 		} else {
 			fmt.Printf("Your input filename must has [dot]csv extension and no special char !\n")
 		}
 		if RegexOutput {
 			OutputFile = Arguments[1]
-			fmt.Printf("Your output file: "+OutputFile+" is valid\n")
+			fmt.Printf("Your output file: " + OutputFile + " is valid\n")
 		} else {
 			fmt.Printf("Your output filename must has [dot]txt extension and no special char !\n")
 		}
@@ -71,7 +71,6 @@ func main() {
 	} else if len(Arguments) > 2 {
 		fmt.Printf("There is too much arguments\n")
 	}
-
 
 	//TODO : MUST BE DELETED, IT'S FOR DEBUG
 	//inputfile = "emails.csv"
@@ -86,40 +85,42 @@ func main() {
 	for _, record := range records {
 
 		matched, _ := regexp.MatchString(`\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b`, record[2])
-
-		if matched == true {
-			client := Client{
-				code:  record[0],
-				nom:   record[1],
-				email: record[2],
-				adress: record[3],
-			}
-
-			// DEBUG
-			// fmt.Printf("Client Code: %s\nNom: %s\nEmail: %s\nAdress: %s\n--- --- ---\n", client.code, client.nom, client.email, client.adress)
-			// log.Printf("Email: %+v\n", client.email)
-
-			f, errFile := os.OpenFile(OutputFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-
-			if errFile != nil {
-				log.Fatal(errFile)
-			}
-
-			defer func(f *os.File) {
-				errDeferClose := f.Close()
-				if errDeferClose != nil {
-					log.Fatal(errDeferClose)
+		fmt.Print(record)
+		if record[2] != "mail@nomail.com" {
+			if matched == true {
+				client := Client{
+					code:   record[0],
+					nom:    record[1],
+					email:  record[2],
+					adress: record[3],
 				}
-			}(f)
 
-			FinalEmail := strings.TrimSpace(client.email)
-			_, errWriteEmail := f.WriteString(FinalEmail + "\n")
+				// DEBUG
+				// fmt.Printf("Client Code: %s\nNom: %s\nEmail: %s\nAdress: %s\n--- --- ---\n", client.code, client.nom, client.email, client.adress)
+				// log.Printf("Email: %+v\n", client.email)
 
-			if errWriteEmail != nil {
-				log.Fatal(errWriteEmail)
+				f, errFile := os.OpenFile(OutputFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+				if errFile != nil {
+					log.Fatal(errFile)
+				}
+
+				defer func(f *os.File) {
+					errDeferClose := f.Close()
+					if errDeferClose != nil {
+						log.Fatal(errDeferClose)
+					}
+				}(f)
+
+				FinalEmail := strings.TrimSpace(client.email)
+				_, errWriteEmail := f.WriteString(FinalEmail + "\n")
+
+				if errWriteEmail != nil {
+					log.Fatal(errWriteEmail)
+				}
+
+				log.Printf("Email %+v was successfully wroten\n", client.email)
 			}
-
-			log.Printf("Email %+v was successfully wroten\n", client.email)
 		}
 	}
 	log.Println("End")
@@ -153,7 +154,7 @@ func readData(fileName string) ([][]string, error) {
 	return records, nil
 }
 
-func Help(){
+func Help() {
 	fmt.Printf("Bienvenue dans l'aide\n")
 	fmt.Printf("Pour utiliser le script il suffit de mettre en premier paramètre\nle fichier d'entrée au format \".csv\" et en second paramètre le fichier de sortie au format \".txt\"\n")
 	fmt.Printf("Exemple: ./converter emails.csv list_email.txt\n")
