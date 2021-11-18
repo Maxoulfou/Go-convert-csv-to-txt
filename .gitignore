@@ -20,6 +20,9 @@
 *.csv
 *.txt
 
+# Mod files
+*.mod
+
 # Output of the go coverage tool
 *.out
 
