@@ -72,9 +72,9 @@ func main() {
 		fmt.Printf("There is too much arguments\n")
 	}
 
-	//TODO : MUST BE DELETED, IT'S FOR DEBUG
-	//inputfile = "emails.csv"
-	//outputfile = "list.txt"
+	// TODO : MUST BE DELETED, IT'S FOR DEBUG
+	// InputFile = "emails.csv"
+	// OutputFile = "list.txt"
 
 	records, errRecords := readData(InputFile)
 
@@ -85,7 +85,7 @@ func main() {
 	for _, record := range records {
 
 		matched, _ := regexp.MatchString(`\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b`, record[2])
-		fmt.Print(record)
+
 		if record[2] != "mail@nomail.com" {
 			if matched == true {
 				client := Client{
