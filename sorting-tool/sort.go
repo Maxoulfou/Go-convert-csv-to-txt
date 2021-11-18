@@ -9,20 +9,6 @@ import (
 )
 
 func SortEmail(SortingFile string) []string {
-	//Setup log file
-	LogFile, errLogs := os.OpenFile("sorting-tool.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-
-	if errLogs != nil {
-		log.Fatalf("Error opening file: %v", errLogs)
-	}
-
-	defer func(f *os.File) {
-		errDeferCloseLogFile := f.Close()
-		if errDeferCloseLogFile != nil {
-			log.Printf(errDeferCloseLogFile.Error())
-		}
-	}(LogFile)
-
 	// Open email list file
 	MailFile, errOpenMailFile := os.OpenFile(SortingFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
@@ -30,10 +16,10 @@ func SortEmail(SortingFile string) []string {
 		log.Fatalf("Error opening file: %v", errOpenMailFile)
 	}
 
-	defer func(f *os.File) {
-		errDeferCloseLogFile := f.Close()
+	defer func(MailFile *os.File) {
+		errDeferCloseLogFile := MailFile.Close()
 		if errDeferCloseLogFile != nil {
-			log.Printf(errDeferCloseLogFile.Error())
+			log.Fatalf("Error opening file: %v", errDeferCloseLogFile.Error())
 		}
 	}(MailFile)
 
@@ -44,15 +30,13 @@ func SortEmail(SortingFile string) []string {
 	fmt.Printf("Line in %+v: %+v\n", SortingFile, lineNB)
 
 	MailList := filetool.ReadLine(SortingFile)
-	for _, item := range MailList {
-		fmt.Printf("item: %+v\n", item)
-	}
 
 	sort.Strings(MailList)
-	fmt.Printf("\n----sorted:----")
+	log.Printf("\n----sorted----\n")
 	for _, item := range MailList {
-		fmt.Printf("item: %+v\n", item)
+		log.Printf("item: %+v\n", item)
 	}
+	log.Printf("\n----end sorted----\n")
 
 	return MailList
 }

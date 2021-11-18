@@ -31,52 +31,6 @@ func main() {
 
 	Arguments = os.Args[1:]
 
-	//Setup log file
-	LogFile, errLogs := os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-
-	if errLogs != nil {
-		log.Fatalf("Error opening file: %v", errLogs.Error())
-	}
-
-	defer func(LogFile *os.File) {
-		errDeferCloseLogFile := LogFile.Close()
-		if errDeferCloseLogFile != nil {
-			log.Printf(errDeferCloseLogFile.Error())
-		}
-	}(LogFile)
-
-	// Setup temp file
-	TempFile, errTmpFile := os.OpenFile("tmp.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-
-	if errTmpFile != nil {
-		log.Fatal("Error opening file: %v", errTmpFile.Error())
-	}
-
-	defer func(TempFile *os.File) {
-		errDeferClose := TempFile.Close()
-		if errDeferClose != nil {
-			log.Fatal(errDeferClose.Error())
-		}
-	}(TempFile)
-
-	// Setup final file
-	FinalFileList, errFinalFile := os.OpenFile(OutputFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-
-	if errFinalFile != nil {
-		log.Fatal("Error opening file: %v", errFinalFile.Error())
-	}
-
-	defer func(FinalFileList *os.File) {
-		errDeferClose := FinalFileList.Close()
-		if errDeferClose != nil {
-			log.Fatal(errDeferClose.Error())
-		}
-	}(FinalFileList)
-
-	log.SetOutput(LogFile)
-	log.Println("Start")
-	fmt.Println("Start ...")
-
 	// --- Arguments --- //
 	if len(Arguments) == 0 {
 		fmt.Println("There is no argument, please execute './converter help'\n")
@@ -108,11 +62,53 @@ func main() {
 	}
 	// ---End Arguments--- //
 
-	// TODO : MUST BE DELETED, IT'S FOR DEBUG
-	// InputFile = "emails.csv"
-	// OutputFile = "list.txt"
+	//Setup log file
+	LogFile, errLogs := os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
-	// Read Datas, stock in records var
+	if errLogs != nil {
+		log.Fatalf("Error opening file: %v", errLogs.Error())
+	}
+
+	defer func(LogFile *os.File) {
+		errDeferCloseLogFile := LogFile.Close()
+		if errDeferCloseLogFile != nil {
+			log.Printf(errDeferCloseLogFile.Error())
+		}
+	}(LogFile)
+
+	// Setup temp file
+	TempFile, errTmpFile := os.OpenFile("tmp.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+
+	if errTmpFile != nil {
+		log.Fatalf("Error opening file: %v", errTmpFile.Error())
+	}
+
+	defer func(TempFile *os.File) {
+		errDeferClose := TempFile.Close()
+		if errDeferClose != nil {
+			log.Fatal(errDeferClose.Error())
+		}
+	}(TempFile)
+
+	// Setup final file
+	FinalFileList, errFinalFile := os.OpenFile(OutputFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+
+	if errFinalFile != nil {
+		log.Fatalf("Error opening file: %v", errFinalFile.Error())
+	}
+
+	defer func(FinalFileList *os.File) {
+		errDeferClose := FinalFileList.Close()
+		if errDeferClose != nil {
+			log.Fatal(errDeferClose.Error())
+		}
+	}(FinalFileList)
+
+	log.SetOutput(LogFile)
+	log.Println("Start")
+	fmt.Println("Start ...")
+
+	// Read Data's, stock in records var
 	records, errRecords := reading_tool.ReadData(InputFile)
 	if errRecords != nil {
 		log.Fatal(errRecords.Error())
@@ -132,10 +128,6 @@ func main() {
 					adress: record[3],
 				}
 
-				// DEBUG
-				// fmt.Printf("Client Code: %s\nNom: %s\nEmail: %s\nAdress: %s\n--- --- ---\n", client.code, client.nom, client.email, client.adress)
-				// log.Printf("Email: %+v\n", client.email)
-
 				FinalEmail := strings.TrimSpace(client.email)
 				_, errWriteEmail := TempFile.WriteString(FinalEmail + "\n")
 
@@ -150,16 +142,19 @@ func main() {
 
 	log.Println("Start sorting email")
 
+	// TODO : fix the sort -> All uppercase email are not sort with precedent lowercase email
+
 	MailList := sorting_tool.SortEmail("tmp.txt")
 	for _, MailItem := range MailList {
 		MailItem = strings.TrimSpace(MailItem)
 		MailItem = strings.ToLower(MailItem)
-		_, ErrorWriteFinalEmail := FinalFileList.WriteString(MailItem)
+		_, ErrorWriteFinalEmail := FinalFileList.WriteString(MailItem + "\n")
 		if ErrorWriteFinalEmail != nil {
 			log.Fatal(ErrorWriteFinalEmail.Error())
 		}
 	}
 
+	TempFile.Close() // If TempFile not close, he's supposed to be used by another process
 	errRemoveTmpFile := os.Remove(TempFile.Name())
 	if errRemoveTmpFile != nil {
 		log.Fatal(errRemoveTmpFile.Error())
