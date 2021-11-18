@@ -12,6 +12,9 @@ bin/
 # Test binary
 *.test
 
+# Test shell script
+test.sh
+
 # Logs files
 *.log
 *.logs
