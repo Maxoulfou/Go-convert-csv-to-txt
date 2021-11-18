@@ -1,0 +1,27 @@
+# IDEA directory
+.idea/
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Logs files
+*.log
+*.logs
+
+# Data files
+*.xls
+*.csv
+*.txt
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
