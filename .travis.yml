@@ -14,5 +14,11 @@ script:
 
   - go build -o bin/
 
+  - ls
+  - cd bin/
+  - ls
+  - pwd
+  - ./converter clients_2021.csv list.txt
+
   # - ./bin/converter emails.csv list.txt
-  - ./bin/converter clients_2021.csv list.txt
+  # - ./bin/converter clients_2021.csv list.txt
