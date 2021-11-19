@@ -25,7 +25,7 @@ test.sh
 *.txt
 
 # Mod files
-*.mod
+# *.mod
 
 # Output of the go coverage tool
 *.out
