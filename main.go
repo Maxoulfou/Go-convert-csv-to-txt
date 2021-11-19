@@ -170,4 +170,5 @@ func main() {
 	elapsed := time.Since(start)
 	log.Printf("Elapsed time : %s\n", elapsed)
 	fmt.Printf("Elapsed time : %s\n", elapsed)
+	os.Exit(0)
 }
