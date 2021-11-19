@@ -19,23 +19,23 @@ script:
   - ls
   - pwd
   - cat <<EOF >> test-data.csv
-  code;nom;email;adress
-  5BB98538-13ED-0685-D462-2749788B6BA1;Remedios Pickett;nascetur.ridiculus@hotmail.edu;9798 Nam Rd.
-  E4827A93-569E-C591-CDE7-C2E8439376AA;Autumn Carey;tincidunt.tempus@icloud.net;250-9099 Ridiculus St.
-  920FE18C-53C6-4A5F-BCD2-465E0D487424;Tanya Whitney;fusce.aliquam@outlook.ca;172 Malesuada St.
-  66572E65-18BB-06B5-6CA8-09BC213B1657;Ebony Sanders;amet@google.com;Ap #506-3951 Mi Ave
-  B5C91277-BE0D-C14E-41A1-928A517EE906;Sydnee Mooney;enim.gravida.sit@aol.net;P.O. Box 128, 2668 Curae Road
-  EAE9D79A-2682-F046-A7D1-860892E587A1;Cruz William;purus.in.molestie@yahoo.ca;Ap #130-6413 Quisque St.
-  B5CE46CC-A57E-3450-5A65-5A20139974C7;Kennedy Abbott;odio@yahoo.com;Ap #618-2715 Dui. Av.
-  23178677-941B-E1F0-8389-5B5F4ED881B2;Shafira Lott;egestas.aliquam@aol.edu;P.O. Box 367, 8587 Donec Rd.
-  3D7B13CD-2214-BD83-0B0E-195621EAF66E;Nero Thomas;eu.lacus@yahoo.couk;277-8483 Enim Road
-  0DCC891C-47EB-C0B2-49B7-6A53A31F5A91;Eagan Sears;cursus.purus@yahoo.net;P.O. Box 805, 6032 Mus. St.
-  D4937233-37A6-217E-7246-22B72BDD3324;Kasimir Cohen;neque@hotmail.com;6462 Sapien. Road
-  EDEEDE32-384C-165C-FAE4-443A0F197D5C;Uriah Cervantes;pharetra@icloud.net;946-1429 Fringilla Ave
-  4179B16E-81A3-D343-EDFC-88DBDD023432;Aristotle Stevenson;ultrices@icloud.com;Ap #800-9761 Urna. Road
-  46CD9969-AB19-8B5D-7AE4-AC64649090E1;Derek Jordan;ante.bibendum.ullamcorper@icloud.edu;Ap #752-2960 Cras Street
-  9EC1AC4C-44DC-219A-6D4D-A1F79A1C16C4;McKenzie Warner;amet.faucibus.ut@icloud.org;241-1480 Sem, Road
-  EOF
+  - code;nom;email;adress
+  - 5BB98538-13ED-0685-D462-2749788B6BA1;Remedios Pickett;nascetur.ridiculus@hotmail.edu;9798 Nam Rd.
+  - E4827A93-569E-C591-CDE7-C2E8439376AA;Autumn Carey;tincidunt.tempus@icloud.net;250-9099 Ridiculus St.
+  - 920FE18C-53C6-4A5F-BCD2-465E0D487424;Tanya Whitney;fusce.aliquam@outlook.ca;172 Malesuada St.
+  - 66572E65-18BB-06B5-6CA8-09BC213B1657;Ebony Sanders;amet@google.com;Ap #506-3951 Mi Ave
+  - B5C91277-BE0D-C14E-41A1-928A517EE906;Sydnee Mooney;enim.gravida.sit@aol.net;P.O. Box 128, 2668 Curae Road
+  - EAE9D79A-2682-F046-A7D1-860892E587A1;Cruz William;purus.in.molestie@yahoo.ca;Ap #130-6413 Quisque St.
+  - B5CE46CC-A57E-3450-5A65-5A20139974C7;Kennedy Abbott;odio@yahoo.com;Ap #618-2715 Dui. Av.
+  - 23178677-941B-E1F0-8389-5B5F4ED881B2;Shafira Lott;egestas.aliquam@aol.edu;P.O. Box 367, 8587 Donec Rd.
+  - 3D7B13CD-2214-BD83-0B0E-195621EAF66E;Nero Thomas;eu.lacus@yahoo.couk;277-8483 Enim Road
+  - 0DCC891C-47EB-C0B2-49B7-6A53A31F5A91;Eagan Sears;cursus.purus@yahoo.net;P.O. Box 805, 6032 Mus. St.
+  - D4937233-37A6-217E-7246-22B72BDD3324;Kasimir Cohen;neque@hotmail.com;6462 Sapien. Road
+  - EDEEDE32-384C-165C-FAE4-443A0F197D5C;Uriah Cervantes;pharetra@icloud.net;946-1429 Fringilla Ave
+  - 4179B16E-81A3-D343-EDFC-88DBDD023432;Aristotle Stevenson;ultrices@icloud.com;Ap #800-9761 Urna. Road
+  - 46CD9969-AB19-8B5D-7AE4-AC64649090E1;Derek Jordan;ante.bibendum.ullamcorper@icloud.edu;Ap #752-2960 Cras Street
+  - 9EC1AC4C-44DC-219A-6D4D-A1F79A1C16C4;McKenzie Warner;amet.faucibus.ut@icloud.org;241-1480 Sem, Road
+  - EOF
   - ./converter test-data.csv list.txt
   - rm test-data.csv
   - more list.txt
