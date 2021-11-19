@@ -1,12 +1,16 @@
 package main
 
 import (
-	"encoding/csv"
+	helping_tool "brochier.xyz/converter/helping-tool"
+	reading_tool "brochier.xyz/converter/reading-tool"
+	"brochier.xyz/converter/sorting-tool"
 	"fmt"
 	"log"
+	"math/big"
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 type Client struct {
@@ -17,37 +21,22 @@ type Client struct {
 }
 
 func main() {
+	start := time.Now()
+	r := new(big.Int)
+	fmt.Println(r.Binomial(1000, 10))
+
 	var Arguments []string
 	var InputFile string
 	var OutputFile string
 
 	Arguments = os.Args[1:]
 
-	//Setup log file
-	f, errLogs := os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-
-	if errLogs != nil {
-		log.Fatalf("Error opening file: %v", errLogs)
-	}
-
-	defer func(f *os.File) {
-		errDeferCloseLogFile := f.Close()
-		if errDeferCloseLogFile != nil {
-			log.Printf(errDeferCloseLogFile.Error())
-		}
-	}(f)
-
-	log.SetOutput(f)
-	log.Println("Start")
-	fmt.Println("Start ...")
-
-	// ---
-
+	// --- Arguments --- //
 	if len(Arguments) == 0 {
 		fmt.Println("There is no argument, please execute './converter help'\n")
 	} else if len(Arguments) == 1 {
 		if Arguments[0] == "help" {
-			Help()
+			helping_tool.Help()
 			os.Exit(1)
 		} else if Arguments[0] != "help" {
 			fmt.Printf("The only argument " + Arguments[0] + " is unknown\n")
@@ -71,17 +60,61 @@ func main() {
 	} else if len(Arguments) > 2 {
 		fmt.Printf("There is too much arguments\n")
 	}
+	// ---End Arguments--- //
 
-	// TODO : MUST BE DELETED, IT'S FOR DEBUG
-	// InputFile = "emails.csv"
-	// OutputFile = "list.txt"
+	//Setup log file
+	LogFile, errLogs := os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
-	records, errRecords := readData(InputFile)
-
-	if errRecords != nil {
-		log.Fatal(errRecords)
+	if errLogs != nil {
+		log.Fatalf("Error opening file: %v", errLogs.Error())
 	}
 
+	defer func(LogFile *os.File) {
+		errDeferCloseLogFile := LogFile.Close()
+		if errDeferCloseLogFile != nil {
+			log.Printf(errDeferCloseLogFile.Error())
+		}
+	}(LogFile)
+
+	// Setup temp file
+	TempFile, errTmpFile := os.OpenFile("tmp.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+
+	if errTmpFile != nil {
+		log.Fatalf("Error opening file: %v", errTmpFile.Error())
+	}
+
+	defer func(TempFile *os.File) {
+		errDeferClose := TempFile.Close()
+		if errDeferClose != nil {
+			log.Fatal(errDeferClose.Error())
+		}
+	}(TempFile)
+
+	// Setup final file
+	FinalFileList, errFinalFile := os.OpenFile(OutputFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+
+	if errFinalFile != nil {
+		log.Fatalf("Error opening file: %v", errFinalFile.Error())
+	}
+
+	defer func(FinalFileList *os.File) {
+		errDeferClose := FinalFileList.Close()
+		if errDeferClose != nil {
+			log.Fatal(errDeferClose.Error())
+		}
+	}(FinalFileList)
+
+	log.SetOutput(LogFile)
+	log.Println("Start")
+	fmt.Println("Start ...")
+
+	// Read Data's, stock in records var
+	records, errRecords := reading_tool.ReadData(InputFile)
+	if errRecords != nil {
+		log.Fatal(errRecords.Error())
+	}
+
+	// Read records line by line as record var
 	for _, record := range records {
 
 		matched, _ := regexp.MatchString(`\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b`, record[2])
@@ -95,67 +128,43 @@ func main() {
 					adress: record[3],
 				}
 
-				// DEBUG
-				// fmt.Printf("Client Code: %s\nNom: %s\nEmail: %s\nAdress: %s\n--- --- ---\n", client.code, client.nom, client.email, client.adress)
-				// log.Printf("Email: %+v\n", client.email)
-
-				f, errFile := os.OpenFile(OutputFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-
-				if errFile != nil {
-					log.Fatal(errFile)
-				}
-
-				defer func(f *os.File) {
-					errDeferClose := f.Close()
-					if errDeferClose != nil {
-						log.Fatal(errDeferClose)
-					}
-				}(f)
-
 				FinalEmail := strings.TrimSpace(client.email)
-				_, errWriteEmail := f.WriteString(FinalEmail + "\n")
+				_, errWriteEmail := TempFile.WriteString(FinalEmail + "\n")
 
 				if errWriteEmail != nil {
-					log.Fatal(errWriteEmail)
+					log.Fatal(errWriteEmail.Error())
 				}
 
 				log.Printf("Email %+v was successfully wroten\n", client.email)
 			}
 		}
 	}
+
+	log.Println("Start sorting email")
+
+	// TODO : fix the sort -> All uppercase email are not sort with precedent lowercase email
+
+	MailList := sorting_tool.SortEmail("tmp.txt")
+	for _, MailItem := range MailList {
+		MailItem = strings.TrimSpace(MailItem)
+		MailItem = strings.ToLower(MailItem)
+		_, ErrorWriteFinalEmail := FinalFileList.WriteString(MailItem + "\n")
+		if ErrorWriteFinalEmail != nil {
+			log.Fatal(ErrorWriteFinalEmail.Error())
+		}
+	}
+
+	TempFile.Close() // If TempFile not close, he's supposed to be used by another process
+	errRemoveTmpFile := os.Remove(TempFile.Name())
+	if errRemoveTmpFile != nil {
+		log.Fatal(errRemoveTmpFile.Error())
+	}
+
 	log.Println("End")
 	fmt.Println("End !")
-}
 
-func readData(fileName string) ([][]string, error) {
-
-	f, errOpenFile := os.Open(fileName)
-
-	if errOpenFile != nil {
-		return [][]string{}, errOpenFile
-	}
-
-	defer f.Close()
-
-	r := csv.NewReader(f)
-	r.Comma = ';'
-	r.LazyQuotes = true
-
-	// Skip first line -> Header
-	if _, errReadCSV := r.Read(); errReadCSV != nil {
-		return [][]string{}, errReadCSV
-	}
-
-	records, errReadAll := r.ReadAll()
-	if errReadAll != nil {
-		return [][]string{}, errReadAll
-	}
-
-	return records, nil
-}
-
-func Help() {
-	fmt.Printf("Bienvenue dans l'aide\n")
-	fmt.Printf("Pour utiliser le script il suffit de mettre en premier paramètre\nle fichier d'entrée au format \".csv\" et en second paramètre le fichier de sortie au format \".txt\"\n")
-	fmt.Printf("Exemple: ./converter emails.csv list_email.txt\n")
+	// Calculate time elapsed
+	elapsed := time.Since(start)
+	log.Printf("Elapsed time : %s\n", elapsed)
+	fmt.Printf("Elapsed time : %s\n", elapsed)
 }

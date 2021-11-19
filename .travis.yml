@@ -1,0 +1,18 @@
+language: go
+
+go:
+  - 1.16.x
+  - 1.17.x
+  - sorting-script
+
+script:
+  - clear
+
+  - rm log.log
+  - rm sorting-tool.log
+  - rm list.txt
+
+  - go build -o bin/
+
+  # - ./bin/converter emails.csv list.txt
+  - ./bin/converter clients_2021.csv list.txt
