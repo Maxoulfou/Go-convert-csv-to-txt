@@ -1,9 +1,9 @@
 package main
 
 import (
-	helping_tool "brochier.xyz/converter/helping-tool"
-	reading_tool "brochier.xyz/converter/reading-tool"
-	"brochier.xyz/converter/sorting-tool"
+	helping_tool "converter/helping-tool"
+	reading_tool "converter/reading-tool"
+	"converter/sorting-tool"
 	"fmt"
 	"log"
 	"math/big"
@@ -154,7 +154,10 @@ func main() {
 		}
 	}
 
-	TempFile.Close() // If TempFile not close, he's supposed to be used by another process
+	errTempFileClose := TempFile.Close()
+	if errTempFileClose != nil {
+		log.Fatalf("Err to close: %+v\n", errTempFileClose.Error())
+	} // If TempFile not close, he's supposed to be used by another process
 	errRemoveTmpFile := os.Remove(TempFile.Name())
 	if errRemoveTmpFile != nil {
 		log.Fatal(errRemoveTmpFile.Error())

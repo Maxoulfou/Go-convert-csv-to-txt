@@ -1,7 +1,7 @@
 package sorting_tool
 
 import (
-	filetool "brochier.xyz/converter/file-tool"
+	filetool "converter/file-tool"
 	"fmt"
 	"log"
 	"os"
